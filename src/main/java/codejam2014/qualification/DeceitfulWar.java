@@ -12,7 +12,7 @@ public class DeceitfulWar {
 
     private static final String SAMPLE = "D-sample.in";
     private static final String SMALL = "D-small-practice.in";
-    private static final String LARGE = "D-large.in";
+    private static final String LARGE = "D-large-practice.in";
 
     private Scanner scanner;
     private PrintWriter writer;
@@ -74,14 +74,16 @@ public class DeceitfulWar {
         try {
             runTest(SAMPLE, true);
             runTest(SMALL, false);
-            // runTest(LARGE, false);
+            runTest(LARGE, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     // problem part
-    private Chest[] chests;
+
+    private double[] naomi;
+    private double[] ken;
 
     /**
      * Solve the problem
@@ -89,136 +91,92 @@ public class DeceitfulWar {
     public void solve() {
         int t = scanner.nextInt();
 
-        // 1 <= T <= 25
+        // 1 <= T <= 50
         for (int i = 1; i <= t; i++) {
             writer.print("Case #");
             writer.print(i + ": ");
 
-            // 1 <= K
-            // 1 <= N <= 200
-            int k = scanner.nextInt();
+            // 1 <= N <= 1000
             int n = scanner.nextInt();
 
-            int keys[] = new int[k];
-            for (int j=0; j<k; j++)
-                keys[j] = scanner.nextInt();
+            naomi = new double[n];
+            for(int j=0; j<n; j++)
+                naomi[j] = scanner.nextDouble();
 
-            chests = new Chest[n];
-            for (int j=0; j<n; j++) {
-                chests[j] = new Chest();
-                chests[j].type = scanner.nextInt();
+            ken = new double[n];
+            for(int j=0; j<n; j++)
+                ken[j] = scanner.nextDouble();
 
-                int ki = scanner.nextInt();
-                chests[j].keys = new int[ki];
-
-                for (int l=0; l<ki; l++)
-                    chests[j].keys[l] = scanner.nextInt();
-            }
-            solve(keys);
+            solveTest();
         }
     }
 
-    private void solve(int keys[]) {
-        Opening opening = new Opening(keys);
-        if (!opening.solve())
-            writer.println("IMPOSSIBLE");
+    private void solveTest() {
+        Arrays.sort(naomi);
+        Arrays.sort(ken);
+
+        writer.printf("%1$d %2$d\n", deceitfulWar(), war());
     }
 
-    private static class Chest {
-        private int type;
-        private int keys[];
-    }
+    private int war() {
+        LinkedList<Double> kenList = asList(ken);
 
-    private class Opening {
-        private Map<Integer, Integer> keysMap;
-        private Set<Integer> opened;
-
-        private Opening(int keys[]) {
-            keysMap = new HashMap<Integer, Integer>();
-            opened = new LinkedHashSet<Integer>();
-
-            for (int key: keys)
-                addKey(key);
-        }
-
-        private Opening(Opening opening) {
-            keysMap = new HashMap<Integer, Integer>(opening.keysMap);
-            opened = new LinkedHashSet<Integer>(opening.opened);
-        }
-
-        // O(200^400) ?
-        private boolean solve() {
-            if (isAllOpened()) {
-                printResult();
-                return true;
-            }
-
-            for (int i=0; i<chests.length; i++) {
-                if (canBeOpened(i)) {
-                    Opening opening = open(i);
-                    if (opening.solve())
-                        return true;
+        int naomiScore = 0;
+        for (double naomiBlock: naomi) {
+            boolean kenHasBigger = false;
+            Iterator<Double> j = kenList.iterator();
+            while(j.hasNext()) {
+                double kenBlock = j.next();
+                if (kenBlock > naomiBlock) {
+                    kenHasBigger = true;
+                    j.remove();
+                    break;
                 }
             }
-            return false;
-        }
-
-        private boolean canBeOpened(int index) {
-            if (opened.contains(index))
-                return false;
-
-            return getKeyCount(chests[index].type) > 0;
-        }
-
-        private Opening open(int index) {
-            Opening opening = new Opening(this);
-
-            opening.opened.add(index);
-            opening.deleteKey(chests[index].type);
-            for (int key: chests[index].keys)
-                opening.addKey(key);
-
-            return opening;
-        }
-
-        private boolean isAllOpened() {
-            for (int i=0; i<chests.length; i++)
-                if (!opened.contains(i))
-                    return false;
-            return true;
-        }
-
-        private void printResult() {
-            for (int index: opened) {
-                writer.print(index+1);
-                writer.print(" ");
+            if (!kenHasBigger) {
+                kenList.removeFirst();
+                naomiScore++;
             }
-            writer.println();
         }
+        return naomiScore;
+    }
 
-        private int getKeyCount(int type) {
-            Integer count = keysMap.get(type);
-            if (count == null)
-                return 0;
-            return count;
-        }
+    private int deceitfulWar() {
+        LinkedList<Double> naomiList = asList(naomi);
+        LinkedList<Double> kenList = asList(ken);
 
-        private void addKey(int type) {
-            Integer count = keysMap.get(type);
-            if (count == null)
-                count = 0;
-            keysMap.put(type, ++count);
-        }
+        int naomiScore = 0;
+        while (!naomiList.isEmpty()) {
+           if (naomiList.getFirst() < kenList.getFirst()) {
+               naomiList.removeFirst();
+               kenList.removeLast();
+           } else {
+               boolean naomiHasBigger = false;
+               Iterator<Double> j = naomiList.iterator();
+               while(j.hasNext()) {
+                   double naomiBlock = j.next();
+                   if (naomiBlock > kenList.getFirst()) {
+                       naomiHasBigger = true;
+                       j.remove();
+                       kenList.removeFirst();
+                       naomiScore++;
+                       break;
+                   }
+               }
+               if (!naomiHasBigger) {
+                   naomiList.removeFirst();
+                   kenList.removeFirst();
+               }
+           }
+       }
+        return naomiScore;
+    }
 
-        private void deleteKey(int type) {
-            Integer count = keysMap.get(type);
-            if (count == null)
-                return;
-
-            if (count > 1)
-                keysMap.put(type, --count);
-            else
-                keysMap.remove(type);
-        }
+    private LinkedList<Double> asList(double[] array) {
+        // don't like to have ArrayList here
+        LinkedList<Double> list = new LinkedList<Double>();
+        for (double block: array)
+            list.add(block);
+        return list;
     }
 }
