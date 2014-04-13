@@ -114,7 +114,7 @@ public class MinesweeperMaster {
 
         Minesweeper minesweeper = new Minesweeper(mines);
         while(true) {
-            System.out.println(minesweeper.toString());
+            // System.out.println(minesweeper.toString());
 
             for (int i=0; i<r; i++)
                 for (int j=0; j<c; j++) {
@@ -248,10 +248,6 @@ public class MinesweeperMaster {
         }
 
         private void visit(int i, int j, boolean[][] visited) {
-            if ((i<0) || (i>=r))
-                return;
-            if ((j<0) || (j>=c))
-                return;
             if (visited[i][j])
                 return;
 
