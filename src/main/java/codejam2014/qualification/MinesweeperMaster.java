@@ -109,8 +109,7 @@ public class MinesweeperMaster {
 
     public String brute(int r, int c, int m) {
         Mine[] mines = new Mine[m];
-        Mine mine = new Mine(0, 0);
-        fill(mines, mine, 0);
+        fill(mines, new Mine(0, 0), 0);
 
         Minesweeper minesweeper = new Minesweeper(mines);
         while(true) {
@@ -140,6 +139,7 @@ public class MinesweeperMaster {
         }
     }
 
+    // ToDo: Flyweight?
     private class Mine {
         int i, j;
 
@@ -187,6 +187,7 @@ public class MinesweeperMaster {
         }
     }
 
+    // ToDo: minimize number of permutations
     private class Minesweeper {
         private Mine[] mines;
         private Set<Mine> mineSet;
