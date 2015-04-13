@@ -103,11 +103,11 @@ public class InfiniteHouseOfPancakes {
                 plates.add(scanner.nextInt());
 
             Collections.sort(plates);
-            writer.printf("%1d\n", dp(plates));
+            writer.printf("%1d\n", brute(plates));
         }
     }
 
-    private int dp(final ArrayList<Integer> plates) {
+    private int brute(final ArrayList<Integer> plates) {
         // try to move: (max, 2]
         int best = Collections.max(plates);
         for (int move = best-1; move >= 2; move--) {
