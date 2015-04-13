@@ -82,8 +82,6 @@ public class InfiniteHouseOfPancakes {
 
     // problem part
 
-    private Map<ArrayList<Integer>, Integer> dpCache = new HashMap<ArrayList<Integer>, Integer>();
-
     /**
      * Solve the problem
      */
