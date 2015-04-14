@@ -106,15 +106,18 @@ public class InfiniteHouseOfPancakes {
     }
 
     private int brute(final ArrayList<Integer> plates) {
-        // try to move: (max, 2]
+        // try to find how many left to eat in usual minutes: (max, 2]
         int best = Collections.max(plates);
-        for (int move = best-1; move >= 2; move--) {
-            int current = move;
-            for (int pancakes: plates) {
-                current += (pancakes - 1) / move;
-            }
+        for (int eaten = best-1; eaten >= 2; eaten--) {
+            int current = eaten;
+            for (int pancakes: plates)
+                current += numberOfSpecialMinutes(pancakes, eaten);
             best = Math.min(best, current);
         }
         return best;
+    }
+
+    private int numberOfSpecialMinutes(int pancakes, int eaten) {
+        return (pancakes - 1) / eaten;
     }
 }
